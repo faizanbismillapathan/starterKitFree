@@ -85,7 +85,7 @@ If you're building commercial projects, client applications, or SaaS products, t
 
 👉 **Available on Gumroad**
 
-**https://YOUR-GUMROAD-LINK**
+**https://pathan0faizan.gumroad.com/l/LaunchKitforLaravel**
 
 ---
 
