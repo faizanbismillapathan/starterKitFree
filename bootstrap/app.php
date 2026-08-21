@@ -36,6 +36,13 @@ return Application::configure(basePath: dirname(__DIR__))
         },
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        /*
+         * Railway / Heroku / any load balancer terminates TLS at the edge and
+         * forwards plain HTTP, passing the real scheme in X-Forwarded-Proto.
+         * Without trusting it, every generated URL says http:// and the browser
+         * blocks the assets as mixed content.
+         */
+    $middleware->trustProxies(at: '*');
         $middleware->web(append: [
             ApplyThemePreference::class,
             SecurityHeaders::class,
