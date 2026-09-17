@@ -214,4 +214,22 @@ return [
 
     'partitioned' => env('SESSION_PARTITIONED_COOKIE', false),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Session Serialization
+    |--------------------------------------------------------------------------
+    |
+    | This value controls the serialization strategy for session data, which
+    | is JSON by default in Laravel 13. Setting this to "php" allows the
+    | storage of PHP objects in the session but can make an application
+    | vulnerable to "gadget chain" serialization attacks if the APP_KEY
+    | is leaked. For seamless upgrade, keep "php" initially, then migrate
+    | to "json" in next release.
+    |
+    | Supported: "json", "php"
+    |
+    */
+
+    'serialization' => env('SESSION_SERIALIZATION', 'php'),
+
 ];

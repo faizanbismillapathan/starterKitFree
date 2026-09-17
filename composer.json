@@ -12,9 +12,9 @@
         "php": "^8.3",
         "barryvdh/laravel-dompdf": "^3.1.2",
         "intervention/image": "^3.11",
-        "laravel/framework": "^12.0",
+        "laravel/framework": "^13.0",
         "laravel/sanctum": "^4.3.3",
-        "laravel/tinker": "^2.10.1",
+        "laravel/tinker": "^3.0",
         "spatie/laravel-permission": "^7.0"
     },
     "require-dev": {
@@ -26,7 +26,7 @@
         "mockery/mockery": "^1.6",
         "nunomaduro/collision": "^8.6",
         "phpstan/phpstan": "^2.2",
-        "phpunit/phpunit": "^11.5.50"
+        "phpunit/phpunit": "^12.0"
     },
     "autoload": {
         "psr-4": {
