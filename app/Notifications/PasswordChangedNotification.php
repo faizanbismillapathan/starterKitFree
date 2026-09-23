@@ -8,10 +8,12 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use Illuminate\Queue\Attributes\DeleteWhenMissingModels;
 
 /**
  * Confirms a password change so the owner can react to unexpected activity.
  */
+#[DeleteWhenMissingModels]
 final class PasswordChangedNotification extends Notification implements ShouldQueue
 {
     use Queueable;

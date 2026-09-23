@@ -4,26 +4,46 @@
 
 | Component | Minimum | Notes |
 |---|---|---|
-| PHP | **8.2** | XAMPP 8.2.12 works. `composer.lock` is pinned to 8.2 |
+| PHP | **8.3** | XAMPP 8.3.12+ works. `composer.lock` is pinned to 8.3 for Laravel 13 |
 | MySQL | 8.0+ | utf8mb4 / InnoDB |
 | Composer | 2.x | |
 | Node.js | LTS (18/20/22) | For building the frontend assets |
 
-Required PHP extensions: `mbstring`, `openssl`, `pdo_mysql`, `curl`, `fileinfo`, `gd`, `zip`, `intl`, `tokenizer`, `xml`.
+Required PHP extensions: `mbstring`, `openssl`, `pdo_mysql`, `pdo_sqlite`, `sqlite3`, `curl`, `fileinfo`, `gd`, `zip`, `intl`, `tokenizer`, `xml`, `bcmath`, `ctype`.
+
+> **Important for Testing:** `phpunit.xml` uses `sqlite :memory:` for fast tests. You MUST enable `pdo_sqlite` and `sqlite3` in `php.ini` or you will get `could not find driver (Connection: sqlite)` error for 15 tests (6 Authentication + 9 SecurityHeaders).
 
 ---
 
 ## Windows / XAMPP quick start
 
-### 1. Disable the broken imagick extension (optional but removes the warning)
+### 1. Fix PHP extensions for XAMPP 8.3 (CRITICAL for Laravel 13 + Tests)
 
-Open `E:\xampp-8.2\php\php.ini` and comment the line out:
+Open `E:\xampp-8.3\php\php.ini`:
 
+**a) Disable imagick (optional - removes warning):**
 ```ini
 ;extension=imagick
 ```
+Project uses GD driver, not imagick.
 
-This project does **not** use imagick — image processing runs on the GD driver.
+**b) Enable sqlite for testing (REQUIRED - 15 tests fail without it):**
+Find and uncomment (remove `;`):
+```ini
+extension=pdo_sqlite
+extension=sqlite3
+```
+If not found, add them at the end of extensions section.
+
+**c) Verify and restart:**
+```bat
+php -m | findstr sqlite
+# Should show: pdo_sqlite, sqlite3
+
+php -v
+# Should show: PHP 8.3.x
+```
+Then restart Apache from XAMPP Control Panel.
 
 ### 2. Install PHP dependencies
 
@@ -31,8 +51,12 @@ This project does **not** use imagick — image processing runs on the GD driver
 composer install
 ```
 
-The lock file is resolved for PHP 8.2, so this installs cleanly with no
-`composer update` required.
+For Laravel 13 upgrade:
+```bat
+composer update --with-all-dependencies -W
+```
+
+The lock file is now pinned to PHP 8.3 for Laravel 13.
 
 ### 3. Create the environment file
 
@@ -124,7 +148,7 @@ AUTH_EMAIL_VERIFICATION_REQUIRED=false
 ## Useful commands
 
 ```bat
-php artisan test              :: run the full test suite
+php artisan test              :: run the full test suite (requires pdo_sqlite enabled)
 vendor\bin\pint               :: format code to PSR-12
 vendor\bin\phpstan analyse    :: static analysis
 php artisan migrate:fresh --seed
@@ -136,8 +160,18 @@ php artisan optimize:clear
 ## Troubleshooting
 
 **`Your lock file does not contain a compatible set of packages`**
-You are on an older PHP than 8.2, or the lock file was generated elsewhere.
+You are on an older PHP than 8.3, or the lock file was generated elsewhere.
 Check with `php -v`, then run `composer install` again.
+
+**`could not find driver (Connection: sqlite, Database: :memory:)`**
+You have 15 tests failing (Authentication + SecurityHeaders). Fix:
+1. Open `E:\xampp-8.3\php\php.ini`
+2. Uncomment `extension=pdo_sqlite` and `extension=sqlite3`
+3. Restart Apache
+4. Verify `php -m | findstr sqlite` shows both
+5. Run `php artisan test` again - should be 18 tests passing
+
+This is NOT a Laravel 13 bug, it's XAMPP default config - sqlite disabled by default.
 
 **`Please provide a valid cache path` / permission errors**
 Ensure `storage/` and `bootstrap/cache/` are writable.
@@ -147,3 +181,11 @@ Run `php artisan storage:link`.
 
 **`SQLSTATE[HY000] [1049] Unknown database`**
 The schema in `DB_DATABASE` does not exist yet — create it (step 4).
+
+**Cache invalid / users logout after L13 deploy**
+Ensure `.env` has pinned values from `.env.example`:
+```
+CACHE_PREFIX=laravel-business-starter-kit-cache-
+REDIS_PREFIX=laravel-business-starter-kit-database-
+SESSION_COOKIE=laravel-business-starter-kit-session
+```
