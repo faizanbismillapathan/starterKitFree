@@ -99,8 +99,8 @@ Instead of starting from scratch every time, I decided to build a reusable, prod
 
 # 🛠 Built With
 
-- Laravel 12
-- PHP 8.2+
+- Laravel 13
+- PHP 8.3+
 - Blade
 - Tailwind CSS
 - Alpine.js
